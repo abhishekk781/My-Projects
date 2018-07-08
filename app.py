@@ -4,28 +4,23 @@ from flask import request
 from flask import redirect
 from flask import url_for
 from flaskext.mysql import MySQL
+from image_links import *
+import random
 
 app = Flask(__name__)
 app.config['MYSQL_DATABASE_HOST'] = 'sql12.freemysqlhosting.net'
 app.config['MYSQL_DATABASE_USER'] = 'sql12243879'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'Cr49XjeJ2y'
 app.config['MYSQL_DATABASE_DB'] = 'sql12243879'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 mysql = MySQL()
 mysql.init_app(app)
 connection = mysql.connect()
 
-@app.route('/test')
-def test():
-	cursor = connection.cursor()
-	cursor.execute('''SELECT quote FROM Quotes where id = 1''')
-	ret = cur.fetchall()
-	return str(ret)
-
 @app.route('/')
 def hello():
-    return render_template("index.html")
+    return render_template("index.html",image=useful_links[random.randint(1,8)])
 
 @app.route('/read_quotes')
 def read_quotes():
@@ -55,7 +50,7 @@ def quotes():
 @app.route('/login',methods=['GET','POST'])
 def login():
 	if request.method=='GET':
-		return render_template("login.html")
+		return render_template("login.html",image=useful_links[random.randint(1,8)])
 	else:
 		username=request.form['username']
 		password=request.form['password']
@@ -74,7 +69,7 @@ def login():
 @app.route('/register',methods=['GET','POST'])
 def register():
 	if request.method=='GET':
-		return render_template("register.html")
+		return render_template("register.html",image=useful_links[random.randint(1,8)])
 	else:
 		firstName=request.form['firstName']
 		lastName=request.form['lastName']
@@ -91,7 +86,7 @@ def register():
 
 @app.route('/contact')
 def contact():
-	return render_template("contact.html")
+	return render_template("contact.html",image=useful_links[random.randint(1,8)])
 
 if __name__ == '__main__':
     app.run(host='localhost',port=5000,debug=True)
