@@ -1,2 +1,2 @@
 This is a simple website having functionality like login,register,create quotes, read quotes etc.
-technologies used are Flask,python,HTML,CSS,Bootstrap,MySQL.
+technologies used are Flask,python,HTML,CSS,Bootstrap,SQLAlchemy.

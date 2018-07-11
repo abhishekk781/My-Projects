@@ -18,11 +18,14 @@
 
 		  <div class="collapse navbar-collapse" id="navbarSupportedContent">
 		    <ul class="navbar-nav mr-auto">
-		      <li class="nav-item active">
+		    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
 		        <a class="nav-link" href="/quotes">Home <span class="sr-only">(current)</span></a>
-		      </li>
-		      <li class="nav-item active">
-		        <a class="nav-link" href="/read_quotes">Read Quotes <span class="sr-only">(current)</span></a>
+		    </button>
+		    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+		    	<a class="nav-link" href="/quotes">Create Quotes <span class="sr-only">(current)</span></a>
+		    </button>
+		      <li class="form-inline my-2 my-lg-0">
+		        Welcome to My_Quote_book!! <span class="sr-only">(current)</span></a>
 		      </li>
 		    </ul>
 		    <form class="form-inline my-2 my-lg-0">
@@ -30,17 +33,18 @@
 		    </form>
 		  </div>
 		</nav>
-
 		<br/>
 		<h> <ul><div class="logo_colour"> POPULAR QUOTES </div> </ul> </h1>
 		{% for r in dis %}
 		<div class="card">
 		  <div class="card-body">
 		    <blockquote class="blockquote mb-0">
-		      <p>{{r[2]}}</p>
-		      <footer class="blockquote-footer">{{r[1]}}<cite title="Source Title"></cite></footer>
+		      <p>{{r.content}}</p>
+		      <footer class="blockquote-footer">{{r.name}}<cite title="Source Title"></cite></footer>
+		      <div> <a href="/quotes">Likes</a> : {{r.likes}} </div>
 		    </blockquote>
 		  </div>
+		 </div>
 		{% endfor %}
 	</body>
 </html>

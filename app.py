@@ -3,66 +3,53 @@ from flask import render_template
 from flask import request
 from flask import redirect
 from flask import url_for
-from flaskext.mysql import MySQL
 from image_links import *
 import random
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['MYSQL_DATABASE_HOST'] = 'sql12.freemysqlhosting.net'
-app.config['MYSQL_DATABASE_USER'] = 'sql12243879'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'Cr49XjeJ2y'
-app.config['MYSQL_DATABASE_DB'] = 'sql12243879'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-mysql = MySQL()
-mysql.init_app(app)
-connection = mysql.connect()
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+db = SQLAlchemy(app)
+
+class User(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	firstName = db.Column(db.String(50), nullable=False)
+	lastName = db.Column(db.String(50), nullable=False)
+	username = db.Column(db.String(20), unique=True, nullable=False)
+	password = db.Column(db.String(20), nullable=False)
+
+	def __repr__(self):
+		return "User('{}','{}','{}','{}')".format(self.firstName, self.lastName, self.username, self.password)
+
+class Quotes(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	name = db.Column(db.String(50), nullable=False)
+	content = db.Column(db.String(500), nullable=False)
+	likes = db.Column(db.Integer)
+	def __repr__(self):
+		return "Quotes('{}','{}','{}')".format(self.name, self.content, self.likes)
 
 @app.route('/')
 def hello():
     return render_template("index.html",image=useful_links[random.randint(1,8)])
-
-@app.route('/read_quotes')
-def read_quotes():
-	cursor = connection.cursor()
-	cursor.execute('''SELECT * FROM Quotes''')
-	result = cursor.fetchall()
-	return render_template("display_quotes.html",dis=result)
-
-@app.route('/quotes',methods=['GET','POST'])
-def quotes():
-	cursor = connection.cursor()
-	cursor.execute('''SELECT * FROM Quotes''')
-	result = cursor.fetchall()
-	if request.method=='GET':
-		return render_template("quotes.html",dis=result)
-	else:
-		name=request.form['name']
-		quote=request.form['quote']
-		cursor = connection.cursor()
-		cursor.execute('''SELECT MAX(id) FROM Quotes''')
-		maxId=cursor.fetchone()
-		cursor.execute('''INSERT INTO Quotes(id,name,quote) VALUES(%s,%s,%s)''',(maxId[0]+1,name,quote))
-		connection.commit()
-		return redirect(url_for('quotes'))
-
 
 @app.route('/login',methods=['GET','POST'])
 def login():
 	if request.method=='GET':
 		return render_template("login.html",image=useful_links[random.randint(1,8)])
 	else:
-		username=request.form['username']
-		password=request.form['password']
-		cursor = connection.cursor()
-		cursor.execute('''SELECT pwd FROM credentials WHERE email=%s''',(username))
-		pwd = cursor.fetchone()
-		cursor.execute('''SELECT firstName FROM credentials WHERE email=%s''',(username))
-		firstName=cursor.fetchone()
-		cursor.execute('''SELECT lastName FROM credentials WHERE email=%s''',(username))
-		lastName=cursor.fetchone()
-		if(pwd[0]==password):
-			return render_template("quotes.html",first=firstName[0],last=lastName[0])
+		username = request.form['username']
+		password = request.form['password']
+		user1 = User.query.filter_by(username=username).all()
+		if(len(user1)==0): return render_template("wrongPass.html",sel="login")
+		pwd = user1[0].password
+		f_name = user1[0].firstName
+		l_name = user1[0].lastName
+		#return str(user1[0])
+		if(pwd==password):
+			return render_template("quotes.html",first=f_name,last=l_name)
 		else:
 			return render_template("wrongPass.html",sel="login")
 
@@ -71,22 +58,40 @@ def register():
 	if request.method=='GET':
 		return render_template("register.html",image=useful_links[random.randint(1,8)])
 	else:
-		firstName=request.form['firstName']
-		lastName=request.form['lastName']
-		username=request.form['username']
-		password=request.form['password']
-		cnfPassword=request.form['cnfPassword']
+		firstName = request.form['firstName']
+		lastName = request.form['lastName']
+		username = request.form['username']
+		password = request.form['password']
+		cnfPassword = request.form['cnfPassword']
 		if(password != cnfPassword):
 			return render_template("wrongPass.html",sel="register")
 		else: 
-			cursor = connection.cursor()
-			cursor.execute('''INSERT INTO credentials(firstName,lastname,email,pwd) VALUES(%s,%s,%s,%s)''',(firstName,lastName,username,password))
-			connection.commit()
+			newuser = User(firstName=firstName, lastName=lastName, username=username, password=password)
+			db.session.add(newuser)
+			db.session.commit()
 			return render_template("registered.html",firstName=firstName,lastName=lastName,username=username,password=password)
+
+@app.route('/quotes',methods=['GET','POST'])
+def quotes():
+	result = Quotes.query.all()
+	if request.method=='GET':
+		return render_template("quotes.html",dis=result)
+	else:
+		name = request.form['name']
+		quote = request.form['quote']
+		newpost = Quotes(name=name, content=quote, likes=0)
+		db.session.add(newpost)
+		db.session.commit()
+		return redirect(url_for('quotes'))
+
+@app.route('/read_quotes')
+def read_quotes():
+	result = Quotes.query.all()
+	return render_template("display_quotes.html",dis=result)
 
 @app.route('/contact')
 def contact():
 	return render_template("contact.html",image=useful_links[random.randint(1,8)])
 
 if __name__ == '__main__':
-    app.run(host='localhost',port=5000,debug=True)
+    app.run(host='localhost',port=8000,debug=True)
