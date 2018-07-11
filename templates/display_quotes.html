@@ -28,23 +28,32 @@
 		        Welcome to My_Quote_book!! <span class="sr-only">(current)</span></a>
 		      </li>
 		    </ul>
-		    <form class="form-inline my-2 my-lg-0">
-		      <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><a href="/login">Sign out</a></button>
-		    </form>
+		    <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><a href="/login">Logout</a></button>
 		  </div>
 		</nav>
 		<br/>
-		<h> <ul><div class="logo_colour"> POPULAR QUOTES </div> </ul> </h1>
+		<div class="alert alert-danger" role="alert">
+  			<h4> POPULAR QUOTES </h4>
+		</div>
+
+		<div class="row">
 		{% for r in dis %}
+		<div class="col-sm-6">
 		<div class="card">
 		  <div class="card-body">
 		    <blockquote class="blockquote mb-0">
 		      <p>{{r.content}}</p>
 		      <footer class="blockquote-footer">{{r.name}}<cite title="Source Title"></cite></footer>
-		      <div> <a href="/quotes">Likes</a> : {{r.likes}} </div>
+		      <form method="post">
+		      <button type="button" class="badge badge-warning">
+				  <a href="/quotes">Likes</a> <span class="badge badge-light">{{r.likes}}</span>
+			  </button>
+		      </form>
 		    </blockquote>
 		  </div>
 		 </div>
+		 </div>
 		{% endfor %}
+		</div>
 	</body>
 </html>

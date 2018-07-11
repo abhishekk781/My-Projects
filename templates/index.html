@@ -33,6 +33,23 @@
       </div>
     </div>
   </div>
-  <img align="middle" src={{image}} >
+  <div class="row">
+    {% for r in dis %}
+    <div class="col-sm-6">
+    <div class="card">
+      <div class="card-body">
+        <blockquote class="blockquote mb-0">
+          <p>{{ r.content }}</p>
+          <footer class="blockquote-footer">{{ r.name }}<cite title="Source Title"></cite></footer>
+          <button type="button" class="badge badge-warning">
+          <a href="/quotes">Likes</a> <span class="badge badge-light">{{r.likes}}</span>
+        </button>
+        </blockquote>
+      </div>
+     </div>
+     </div>
+    {% endfor %}
+    </div>
+  <img src={{image}} class="rounded mx-auto d-block" alt="...">
 </body>
 </html>

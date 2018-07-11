@@ -32,8 +32,9 @@ class Quotes(db.Model):
 		return "Quotes('{}','{}','{}')".format(self.name, self.content, self.likes)
 
 @app.route('/')
-def hello():
-    return render_template("index.html",image=useful_links[random.randint(1,8)])
+def home():
+	result = Quotes.query.all()
+	return render_template("index.html", image=useful_links[random.randint(1,8)], dis=result)
 
 @app.route('/login',methods=['GET','POST'])
 def login():
@@ -84,14 +85,15 @@ def quotes():
 		db.session.commit()
 		return redirect(url_for('quotes'))
 
-@app.route('/read_quotes')
+@app.route('/read_quotes',methods=['GET','POST'])
 def read_quotes():
 	result = Quotes.query.all()
 	return render_template("display_quotes.html",dis=result)
+
 
 @app.route('/contact')
 def contact():
 	return render_template("contact.html",image=useful_links[random.randint(1,8)])
 
 if __name__ == '__main__':
-    app.run(host='localhost',port=8000,debug=True)
+    app.run(host='localhost',port=5000,debug=True)
